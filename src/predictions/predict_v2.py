@@ -61,7 +61,16 @@ class Predictor:
         return total_fixtures
 
     def _team_scoreline_freq(self, team: str):
+
         freq: dict[Scoreline, int] = {}
+
+        if team is None:
+            print("Warning: team is None")
+            return freq  # Return empty dictionary if team is None
+
+        if team not in self.fixtures.index:
+            print(f"Warning: team {team} not found in fixtures")
+            return freq  # Return empty dictionary if team is not found
 
         team_row = self.fixtures.loc[team]
         # Remove higher-level multi-index
@@ -92,6 +101,13 @@ class Predictor:
 
     def _fixture_scoreline_freq(self, team1: str, team2: str):
         freq: dict[Scoreline, int] = {}
+        if team1 is None or team2 is None:
+            print("Warning: team1 or team2 is None")
+            return freq  # Return empty dictionary if any team is None
+
+        if team1 not in self.fixtures.index:
+            print(f"Warning: team1 {team1} not found in fixtures")
+            return freq  # Return empty dictionary if team1 is not found
 
         team1_row = self.fixtures.loc[team1]
         # Remove higher-level multi-index
@@ -312,6 +328,9 @@ class Predictor:
             freq[scoreline] += 1 * weight
 
     def get_recent_scorelines(self, team: str, num_matches: Optional[int]):
+        if team is None or team not in self.fixtures.index:
+            print(f"Warning: team {team} is None or not found in fixtures")
+            return []
         team_row = self.fixtures.loc[team]
         # Remove higher-level multi-index
         team_row.index = team_row.index.get_level_values(2)

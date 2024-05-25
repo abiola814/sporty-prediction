@@ -41,24 +41,26 @@ class Upcoming(DF):
             return predictions
 
         for team, row in self.df.iterrows():
-            if row["atHome"]:
-                home_initials = convert_team_name_or_initials(team)
-                away_initials = convert_team_name_or_initials(row["team"])
-            else:
-                home_initials = convert_team_name_or_initials(row["team"])
-                away_initials = convert_team_name_or_initials(team)
+            # Check if date is not None
+            if row["date"] is not None:
+                if row["atHome"]:
+                    home_initials = convert_team_name_or_initials(team)
+                    away_initials = convert_team_name_or_initials(row["team"])
+                else:
+                    home_initials = convert_team_name_or_initials(row["team"])
+                    away_initials = convert_team_name_or_initials(team)
 
-            # home_goals, away_goals = extract_int_score(row["prediction"])
+                # home_goals, away_goals = extract_int_score(row["prediction"])
 
-            predictions[team] = {
-                "date": row["date"].to_pydatetime(),
-                "homeInitials": home_initials,
-                "awayInitials": away_initials,
-                "prediction": {
-                    "homeGoals": row["prediction"].home_goals,
-                    "awayGoals": row["prediction"].away_goals,
-                },
-            }
+                predictions[team] = {
+                    "date": row["date"].to_pydatetime(),
+                    "homeInitials": home_initials,
+                    "awayInitials": away_initials,
+                    "prediction": {
+                        "homeGoals": row["prediction"].home_goals,
+                        "awayGoals": row["prediction"].away_goals,
+                    },
+                }
 
         return predictions
 
@@ -265,7 +267,7 @@ class Upcoming(DF):
         num_seasons: int = 3,
         display: bool = False,
     ):
-        """ Assigns self.df a DataFrame for details about the next game each team
+        """Assigns self.df a DataFrame for details about the next game each team
             has to play.
 
             Rows: the 20 teams participating in the current season

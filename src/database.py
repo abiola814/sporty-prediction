@@ -3,6 +3,8 @@ from os.path import dirname, join
 from typing import Optional
 
 import pymongo
+from pymongo.errors import DuplicateKeyError
+
 from dotenv import load_dotenv
 
 
@@ -18,7 +20,6 @@ class Database:
         MONGODB_DATABASE = getenv("MONGODB_DATABASE")
         # self.connection_string = f"mongodb+srv://12345:12345@cluster0.8qyybcc.mongodb.net/dashbaord?retryWrites=true&w=majority&authSource=admin"
         self.connection_string = "mongodb://localhost:27017/"
-
 
     async def get_predictions(self):
         predictions = None
@@ -170,10 +171,26 @@ class Database:
 
     def update_team_data(self, team_data: dict, season: int):
         with pymongo.MongoClient(self.connection_string) as client:
-            collection = client["PremierLeague"]["TeamData"]  # Accessing PremierLeague database and TeamData collection
-            collection.insert_one({"_id": season, **team_data})
+            collection = client["PremierLeague"][
+                "TeamData"
+            ]  # Accessing PremierLeague database and TeamData collection
+            try:
+                collection.insert_one({"_id": season, **team_data})
+            except DuplicateKeyError as e:
+                print(f"Duplicate key error occurred for season {season}: {e}")
+                # Replace the existing document with the new one
+                collection.replace_one({"_id": season}, {"_id": season, **team_data})
 
     def update_fantasy_data(self, fantasy_data: dict):
         with pymongo.MongoClient(self.connection_string) as client:
-            collection = client["PremierLeague"]["Fantasy"]  # Accessing PremierLeague database and Fantasy collection
-            collection.insert_one({"_id": "fantasy", **fantasy_data})
+            collection = client["PremierLeague"][
+                "Fantasy"
+            ]  # Accessing PremierLeague database and Fantasy collection
+            try:
+                collection.insert_one({"_id": "fantasy", **fantasy_data})
+            except DuplicateKeyError as e:
+                print(f"Duplicate key error occurred for fantasy: {e}")
+                # Replace the existing document with the new one
+                collection.replace_one(
+                    {"_id": "fantasy"}, {"_id": "fantasy", **fantasy_data}
+                )

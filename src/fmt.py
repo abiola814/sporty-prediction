@@ -70,6 +70,9 @@ def convert_team_name_or_initials(team: str):
     Returns:
         str: Three-letter team initials or team name.
     """
+    if team is None:
+        return ""  # Return empty string or handle appropriately based on your use case
+
     if team in names_and_initials:
         return names_and_initials[team]
     elif len(team) == 3:
@@ -117,11 +120,22 @@ def identical_fixtures(scoreline1: str, scoreline2: str):
     return identical
 
 
-def identical_result(predicted_home_goals, predicted_away_goals, act_home_goals, act_away_goals):
+def identical_result(
+    predicted_home_goals, predicted_away_goals, act_home_goals, act_away_goals
+):
     return (
-        (predicted_home_goals == predicted_away_goals and act_home_goals == act_away_goals)
-        or (predicted_home_goals > predicted_away_goals and act_home_goals > act_away_goals)
-        or (predicted_home_goals < predicted_away_goals and act_home_goals < act_away_goals)
+        (
+            predicted_home_goals == predicted_away_goals
+            and act_home_goals == act_away_goals
+        )
+        or (
+            predicted_home_goals > predicted_away_goals
+            and act_home_goals > act_away_goals
+        )
+        or (
+            predicted_home_goals < predicted_away_goals
+            and act_home_goals < act_away_goals
+        )
     )
 
 
@@ -146,13 +160,9 @@ def format_scoreline_str(
 
     # Construct prediction string for display...
     if at_home:
-        scoreline = (
-            f"{team_initials} {scored} - {conceded} {opposition_initials}"
-        )
+        scoreline = f"{team_initials} {scored} - {conceded} {opposition_initials}"
     else:
-        scoreline = (
-            f"{opposition_initials} {conceded} - {scored} {team_initials}"
-        )
+        scoreline = f"{opposition_initials} {conceded} - {scored} {team_initials}"
     return scoreline
 
 
